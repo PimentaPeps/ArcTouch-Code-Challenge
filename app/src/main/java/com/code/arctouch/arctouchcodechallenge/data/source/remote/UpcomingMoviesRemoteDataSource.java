@@ -45,7 +45,14 @@ public class UpcomingMoviesRemoteDataSource implements UpcomingMoviesDataSource 
             ResponsePage responsePage = null;
             do {
                 responsePage = movies.getUpcomingMovies("en", responsePage == null ? 1 : responsePage.getPage() + 1);
-                list.addAll(responsePage.getResults());
+                List<UpcomingMovie> internalList = responsePage.getResults();
+                for (UpcomingMovie upcomingMovie : internalList) {
+                    for (int i = 0; i < upcomingMovie.getGenre_ids().size(); i++) {
+                        upcomingMovie.getGenre_ids()
+                                .set(i, Api.getInstance().getGenreName(Integer.valueOf(upcomingMovie.getGenre_ids().get(i))));
+                    }
+                }
+                list.addAll(internalList);
             } while (responsePage.getTotalPages() > responsePage.getPage());
 
             mAppExecutors.networkIO().execute(new Runnable() {

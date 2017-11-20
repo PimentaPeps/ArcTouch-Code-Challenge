@@ -8,6 +8,9 @@ import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.core.IdP
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 /**
  * UpcomingMovie Model entity for database and API
  */
@@ -24,7 +27,6 @@ public class UpcomingMovie extends IdProperty {
     @ColumnInfo(name = "original_title")
     @JsonProperty("original_title")
     private String originalTitle;
-
 
     @Nullable
     @ColumnInfo(name = "popularity")
@@ -75,6 +77,11 @@ public class UpcomingMovie extends IdProperty {
     @ColumnInfo(name = "vote_count")
     @JsonProperty("vote_count")
     private int voteCount;
+
+    @Nullable
+    @ColumnInfo(name = "genre_ids")
+    @JsonProperty("genre_ids")
+    private ArrayList<String> genre_ids;
 
     public String getBackdropPath() {
         return backdropPath;
@@ -175,5 +182,24 @@ public class UpcomingMovie extends IdProperty {
     @Override
     public String toString() {
         return getTitle() + " - " + getReleaseDate();
+    }
+
+    @Nullable
+    public ArrayList<String> getGenre_ids() {
+        return genre_ids;
+    }
+
+    public void setGenre_ids(@Nullable ArrayList<String> genre_ids) {
+        this.genre_ids = genre_ids;
+    }
+
+    public String getGenres() {
+        StringBuilder sb = new StringBuilder();
+        for (Iterator iter = genre_ids.iterator(); iter.hasNext(); ) {
+            sb.append(iter.next());
+            if (iter.hasNext())
+                sb.append(" | ");
+        }
+        return sb.toString();
     }
 }

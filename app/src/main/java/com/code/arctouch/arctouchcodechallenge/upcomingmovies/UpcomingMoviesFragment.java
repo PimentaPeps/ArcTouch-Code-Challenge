@@ -288,7 +288,7 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
                         .load(Api.createImageUrl(upcomingMovie.getBackdropPath(), "w500").toString())
                         .into(holder.mUpcomingMovieImage);
             holder.mUpcomingMovieTitle.setText(upcomingMovie.getTitle());
-            holder.mUpcomingMovieGenre.setText(upcomingMovie.getReleaseDate());
+            holder.mUpcomingMovieGenre.setText(upcomingMovie.getGenres());
             holder.mUpcomingMovieReleaseDate.setText(upcomingMovie.getReleaseDate());
         }
 
@@ -311,7 +311,7 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
             public MyViewHolder(View v) {
                 super(v);
                 mUpcomingMovieTitle = v.findViewById(R.id.upcoming_movie_title);
-                mUpcomingMovieGenre = v.findViewById(R.id.upcoming_movie_gender);
+                mUpcomingMovieGenre = v.findViewById(R.id.upcoming_movie_genre);
                 mUpcomingMovieReleaseDate = v.findViewById(R.id.upcoming_movie_release_date);
                 mUpcomingMovieImage = v.findViewById(R.id.upcoming_movie_backdrop_image);
             }

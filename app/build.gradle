@@ -90,5 +90,6 @@ dependencies {
 
     compile "org.slf4j:jcl-over-slf4j:$rootProject.slf4jVersion"
     compile "com.squareup.picasso:picasso:$rootProject.picassoVersion"
+    compile "com.google.code.gson:gson:$rootProject.gsonVersion"
 //    compile "commons-codec:commons-codec:$rootProject.commonsCodecVersion"
 }

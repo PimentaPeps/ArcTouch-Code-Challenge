@@ -1,6 +1,7 @@
 package com.code.arctouch.arctouchcodechallenge.data.source.remote;
 
 import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.config.ImagesConfiguration;
+import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.genre.GenreResponse;
 import com.code.arctouch.arctouchcodechallenge.data.source.remote.tools.ApiUrl;
 import com.code.arctouch.arctouchcodechallenge.data.source.remote.tools.Requester;
 import com.code.arctouch.arctouchcodechallenge.data.source.remote.tools.UpcomingMovieException;
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Api main class, contains a singleton
@@ -18,12 +20,14 @@ public class Api {
 
     private static Api instance;
     private static ImagesConfiguration imagesConfiguration;
+    private static List<GenreResponse> genreResponse;
     private String mApiKey = "1f54bd990f1cdfb230adb312546d765d";
     private UrlReader mUrlReader;
 
     private Api() {
         this.mUrlReader = new Requester();
         try {
+            genreResponse = new Genre(this).getGenre().getGenres();
             imagesConfiguration = new Config(this).getConfig().getImagesConfiguration();
         } catch (UpcomingMovieException ex) {
             throw ex;
@@ -56,6 +60,15 @@ public class Api {
         } catch (MalformedURLException ex) {
             throw new UpcomingMovieException(sb.toString(), ex);
         }
+    }
+
+    public String getGenreName(int id) {
+        for (int i = 0; i < genreResponse.size(); i++) {
+            if (id == Integer.valueOf(genreResponse.get(i).getId())) {
+                return genreResponse.get(i).getName();
+            }
+        }
+        return null;
     }
 
     public String requestWebPage(ApiUrl apiUrl) {

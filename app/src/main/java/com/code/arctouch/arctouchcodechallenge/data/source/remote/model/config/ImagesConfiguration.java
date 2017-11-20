@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 /**
- * Images Model class from ConfigResults to serialize from API
+ * Images Model class from GenreResults to serialize from API
  */
 public class ImagesConfiguration extends AbstractJsonMapper {
 

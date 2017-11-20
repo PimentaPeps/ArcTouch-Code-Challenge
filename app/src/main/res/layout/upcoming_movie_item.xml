@@ -32,7 +32,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
     <TextView
-        android:id="@+id/upcoming_movie_gender"
+        android:id="@+id/upcoming_movie_genre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
