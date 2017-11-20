@@ -1,0 +1,47 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.0.0'
+        
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+// Define versions in a single place
+ext {
+    // Sdk and tools
+    // Support library and arcitecture components support minSdk 14 and above.
+    minSdkVersion = 15
+    targetSdkVersion = 26
+    compileSdkVersion = 26
+    buildToolsVersion = '26.0.2'
+
+    // App dependencies
+    roomVersion = "1.0.0"
+    guavaVersion = '18.0'
+    espressoVersion = '3.0.1'
+    apacheCommonsVersion = '3.3.2'
+    yamjVersion = '1.1'
+    fasterXMLVersion = '2.4.4'
+    slf4jVersion = '1.7.7'
+//    commonsCodecVersion = '1.10'
+}

@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.code.arctouch.arctouchcodechallenge.com.code.arctouch.arctouchcodechallenge.MainActivity">
+    <item
+        android:id="@+id/menu_search"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="@string/menu_filter"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="collapseActionView|ifRoom" />
+    <item
+        android:id="@+id/menu_filter"
+        android:icon="@drawable/ic_filter_list"
+        android:title="@string/menu_filter"
+        app:showAsAction="always" />
+</menu>

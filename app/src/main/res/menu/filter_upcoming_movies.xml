@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/filter_item_title_asc"
+        android:title="@string/filter_title_asc" />
+    <item
+        android:id="@+id/filter_item_title_desc"
+        android:title="@string/filter_title_desc" />
+    <item
+        android:id="@+id/filter_item_pop"
+        android:title="@string/filter_pop" />
+    <item
+        android:id="@+id/filter_item_release_date"
+        android:title="@string/filter_release_date" />
+</menu>
