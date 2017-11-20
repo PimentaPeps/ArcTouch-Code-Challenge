@@ -43,5 +43,6 @@ ext {
     yamjVersion = '1.1'
     fasterXMLVersion = '2.4.4'
     slf4jVersion = '1.7.7'
+    picassoVersion = '2.5.2'
 //    commonsCodecVersion = '1.10'
 }

@@ -1,5 +1,6 @@
 package com.code.arctouch.arctouchcodechallenge.upcomingmovies;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,19 +8,22 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.code.arctouch.arctouchcodechallenge.R;
+import com.code.arctouch.arctouchcodechallenge.data.source.remote.Api;
 import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.UpcomingMovie;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesContract.View {
 
+    private static final int VERTICAL_ITEM_SPACE = 48;
     private UpcomingMoviesContract.Presenter mPresenter;
     /**
      * Listener for clicks on upcomingMovies in the ListView.
@@ -60,7 +65,7 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mListAdapter = new UpcomingMoviesAdapter(new ArrayList<UpcomingMovie>(0), mItemListener);
+        mListAdapter = new UpcomingMoviesAdapter(new ArrayList<UpcomingMovie>(0), mItemListener, getContext());
     }
 
     @Override
@@ -81,8 +86,15 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
         View root = inflater.inflate(R.layout.upcoming_movies_frag, container, false);
 
         // Set up upcomingMovies view
-        ListView listView = root.findViewById(R.id.upcoming_movies_list);
-        listView.setAdapter(mListAdapter);
+        RecyclerView recyclerView = root.findViewById(R.id.upcoming_movies_list);
+        recyclerView.setAdapter(mListAdapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+        //add ItemDecoration
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation());
+
+        recyclerView.addItemDecoration(dividerItemDecoration);
         mFilteringLabelView = root.findViewById(R.id.filtering_label);
         mUpcomingMoviesView = root.findViewById(R.id.upcoming_movies_ll);
 
@@ -100,7 +112,7 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
         // Set the scrolling view in the custom SwipeRefreshLayout.
-        swipeRefreshLayout.setScrollUpChild(listView);
+        swipeRefreshLayout.setScrollUpChild(recyclerView);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -241,14 +253,15 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
         void onUpcomingMovieClick(UpcomingMovie clickedUpcomingMovie);
     }
 
-    private static class UpcomingMoviesAdapter extends BaseAdapter {
-
+    private static class UpcomingMoviesAdapter extends RecyclerView.Adapter<UpcomingMoviesAdapter.MyViewHolder> {
+        private final Context mContext;
         private List<UpcomingMovie> mUpcomingMovies;
         private UpcomingMovieItemListener mItemListener;
 
-        public UpcomingMoviesAdapter(List<UpcomingMovie> upcomingMovies, UpcomingMovieItemListener itemListener) {
+        public UpcomingMoviesAdapter(List<UpcomingMovie> upcomingMovies, UpcomingMovieItemListener itemListener, Context context) {
             setList(upcomingMovies);
             mItemListener = itemListener;
+            mContext = context;
         }
 
         public void replaceData(List<UpcomingMovie> upcomingMovies) {
@@ -261,13 +274,22 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
         }
 
         @Override
-        public int getCount() {
-            return mUpcomingMovies.size();
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.upcoming_movie_item, parent, false);
+            return new MyViewHolder(v);
         }
 
         @Override
-        public UpcomingMovie getItem(int i) {
-            return mUpcomingMovies.get(i);
+        public void onBindViewHolder(MyViewHolder holder, int position) {
+            final UpcomingMovie upcomingMovie = mUpcomingMovies.get(position);
+            if (upcomingMovie.getBackdropPath() != null)
+                Picasso.with(mContext)
+                        .load(Api.createImageUrl(upcomingMovie.getBackdropPath(), "w500").toString())
+                        .into(holder.mUpcomingMovieImage);
+            holder.mUpcomingMovieTitle.setText(upcomingMovie.getTitle());
+            holder.mUpcomingMovieGenre.setText(upcomingMovie.getReleaseDate());
+            holder.mUpcomingMovieReleaseDate.setText(upcomingMovie.getReleaseDate());
         }
 
         @Override
@@ -276,26 +298,23 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            View rowView = view;
-            if (rowView == null) {
-                LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-                rowView = inflater.inflate(R.layout.upcoming_movie_item, viewGroup, false);
+        public int getItemCount() {
+            return mUpcomingMovies.size();
+        }
+
+        public class MyViewHolder extends RecyclerView.ViewHolder {
+            public ImageView mUpcomingMovieImage;
+            public TextView mUpcomingMovieTitle;
+            public TextView mUpcomingMovieGenre;
+            public TextView mUpcomingMovieReleaseDate;
+
+            public MyViewHolder(View v) {
+                super(v);
+                mUpcomingMovieTitle = v.findViewById(R.id.upcoming_movie_title);
+                mUpcomingMovieGenre = v.findViewById(R.id.upcoming_movie_gender);
+                mUpcomingMovieReleaseDate = v.findViewById(R.id.upcoming_movie_release_date);
+                mUpcomingMovieImage = v.findViewById(R.id.upcoming_movie_backdrop_image);
             }
-
-            final UpcomingMovie upcomingMovie = getItem(i);
-
-            TextView titleTV = rowView.findViewById(R.id.title);
-            titleTV.setText(upcomingMovie.getTitle());
-
-            rowView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mItemListener.onUpcomingMovieClick(upcomingMovie);
-                }
-            });
-
-            return rowView;
         }
     }
 
