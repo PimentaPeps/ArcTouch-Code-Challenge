@@ -87,9 +87,18 @@ public class MovieDetailFragment extends DialogFragment implements MovieDetailCo
 
     @Override
     public void showMovie(Movie movie) {
-        Picasso.with(getContext())
-                .load(Api.createImageUrl(movie.getPosterPath(), "w500").toString())
-                .into(imageCover);
+
+        try {
+            if (movie.getPosterPath() != null)
+                Picasso.with(getContext())
+                        .load(Api.createImageUrl(movie.getPosterPath(), "w500").toString())
+                        .into(imageCover);
+            else {
+                imageCover.setImageResource(R.drawable.ic_broken_image_black_100dp);
+            }
+        } catch (Exception e) {
+            imageCover.setImageResource(R.drawable.ic_broken_image_black_100dp);
+        }
         movieTitle.setText(movie.getTitle());
         movieYear.setText(movie.getReleaseDate());
         movieOverview.setText(movie.getOverview());

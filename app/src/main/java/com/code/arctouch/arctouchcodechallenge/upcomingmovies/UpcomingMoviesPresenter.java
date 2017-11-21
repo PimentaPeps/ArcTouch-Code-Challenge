@@ -22,7 +22,8 @@ public class UpcomingMoviesPresenter implements UpcomingMoviesContract.Presenter
     private final UpcomingMoviesContract.View mUpcomingMoviesView;
     private final GetUpcomingMovies mGetUpcomingMovies;
     private final UseCaseHandler mUseCaseHandler;
-    private UpcomingMoviesFilterType mCurrentFiltering = UpcomingMoviesFilterType.RELEASE_DATE_UPCOMINGMOVIES;
+    private UpcomingMoviesFilterType mCurrentFiltering = UpcomingMoviesFilterType.POPULARITY_UPCOMINGMOVIES;
+    private String mFilteringWord = "";
     private boolean mFirstLoad = true;
 
     public UpcomingMoviesPresenter(@NonNull UseCaseHandler useCaseHandler,
@@ -56,7 +57,7 @@ public class UpcomingMoviesPresenter implements UpcomingMoviesContract.Presenter
         }
 
         GetUpcomingMovies.RequestValues requestValue = new GetUpcomingMovies.RequestValues(forceUpdate,
-                mCurrentFiltering);
+                mCurrentFiltering, mFilteringWord);
 
         mUseCaseHandler.execute(mGetUpcomingMovies, requestValue,
                 new UseCase.UseCaseCallback<GetUpcomingMovies.ResponseValue>() {
@@ -91,8 +92,8 @@ public class UpcomingMoviesPresenter implements UpcomingMoviesContract.Presenter
 
     private void showFilterLabel() {
         switch (mCurrentFiltering) {
-            case POPULARITY_UPCOMINGMOVIES:
-                mUpcomingMoviesView.showPopularityFilterLabel();
+            case RELEASE_DATE_UPCOMINGMOVIES:
+                mUpcomingMoviesView.showReleaseDateFilterLabel();
                 break;
             case TITLE_ASC_UPCOMINGMOVIES:
                 mUpcomingMoviesView.showTitleAscFilterLabel();
@@ -101,7 +102,7 @@ public class UpcomingMoviesPresenter implements UpcomingMoviesContract.Presenter
                 mUpcomingMoviesView.showTitleDescFilterLabel();
                 break;
             default:
-                mUpcomingMoviesView.showReleaseDateFilterLabel();
+                mUpcomingMoviesView.showPopularityFilterLabel();
                 break;
         }
     }
@@ -129,8 +130,9 @@ public class UpcomingMoviesPresenter implements UpcomingMoviesContract.Presenter
      *                    {@link UpcomingMoviesFilterType#POPULARITY_UPCOMINGMOVIES}
      */
     @Override
-    public void setFiltering(UpcomingMoviesFilterType requestType) {
+    public void setFiltering(UpcomingMoviesFilterType requestType, String filteringWord) {
         mCurrentFiltering = requestType;
+        mFilteringWord = filteringWord;
     }
 
 }

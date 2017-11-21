@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             UpcomingMoviesFilterType currentFiltering =
                     (UpcomingMoviesFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
-            mUpcomingMoviesPresenter.setFiltering(currentFiltering);
+            mUpcomingMoviesPresenter.setFiltering(currentFiltering, "");
         }
     }
 

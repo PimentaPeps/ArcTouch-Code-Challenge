@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.code.arctouch.arctouchcodechallenge.Injection;
@@ -55,6 +56,7 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
     private TextView mNoUpcomingMovieMainView;
     private LinearLayout mUpcomingMoviesView;
     private TextView mFilteringLabelView;
+    private boolean hasSetListener = false;
 
     public UpcomingMoviesFragment() {
         // Requires empty public constructor
@@ -134,11 +136,32 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
             case R.id.menu_filter:
                 showFilteringPopUpMenu();
                 break;
-//            case R.id.menu_refresh:
-//                mPresenter.loadUpcomingMovies(true);
-//                break;
+            case R.id.menu_search:
+                setSearchListener(item);
+                break;
         }
         return true;
+    }
+
+    private void setSearchListener(MenuItem item) {
+        if (!hasSetListener) {
+            ((SearchView) item.getActionView()).setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    mPresenter.setFiltering(mPresenter.getFiltering(), query);
+                    mPresenter.loadUpcomingMovies(false);
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    mPresenter.setFiltering(mPresenter.getFiltering(), newText);
+                    mPresenter.loadUpcomingMovies(false);
+                    return false;
+                }
+            });
+            hasSetListener = true;
+        }
     }
 
     @Override
@@ -149,17 +172,17 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.filter_item_pop:
-                        mPresenter.setFiltering(UpcomingMoviesFilterType.POPULARITY_UPCOMINGMOVIES);
+                    case R.id.filter_item_release_date:
+                        mPresenter.setFiltering(UpcomingMoviesFilterType.RELEASE_DATE_UPCOMINGMOVIES, "");
                         break;
                     case R.id.filter_item_title_asc:
-                        mPresenter.setFiltering(UpcomingMoviesFilterType.TITLE_ASC_UPCOMINGMOVIES);
+                        mPresenter.setFiltering(UpcomingMoviesFilterType.TITLE_ASC_UPCOMINGMOVIES, "");
                         break;
                     case R.id.filter_item_title_desc:
-                        mPresenter.setFiltering(UpcomingMoviesFilterType.TITLE_DESC_UPCOMINGMOVIES);
+                        mPresenter.setFiltering(UpcomingMoviesFilterType.TITLE_DESC_UPCOMINGMOVIES, "");
                         break;
                     default:
-                        mPresenter.setFiltering(UpcomingMoviesFilterType.RELEASE_DATE_UPCOMINGMOVIES);
+                        mPresenter.setFiltering(UpcomingMoviesFilterType.POPULARITY_UPCOMINGMOVIES, "");
                         break;
                 }
                 mPresenter.loadUpcomingMovies(false);
@@ -235,21 +258,6 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
 
     @Override
     public void showUpcomingMovieDetailsUi(String UpcomingMovieId) {
-        //Call detail fragment
-        //TO-DO
-//        Intent intent = new Intent(getContext(), UpcomingMovieDetailActivity.class);
-//        intent.putExtra(UpcomingMovieDetailActivity.EXTRA_UpcomingMovie_ID, UpcomingMovieId);
-//        startActivity(intent);
-
-//        MovieDetailFragment movieDetailFragment =
-//                (MovieDetailFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.upcoming_movies_container);
-//        if (movieDetailFragment == null) {
-//            // Create the fragment
-//            movieDetailFragment = MovieDetailFragment.newInstance();
-//            ActivityUtils.addFragmentToActivity(
-//                    getActivity().getSupportFragmentManager(), movieDetailFragment, R.id.upcoming_movies_container);
-//        }
-
         MovieDetailFragment movieDetailFragment = MovieDetailFragment.newInstance();
         movieDetailFragment.show((getActivity()).getSupportFragmentManager().beginTransaction(), "MyDialogFragment");
 
@@ -304,17 +312,29 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
 
         @Override
         public void onBindViewHolder(MyViewHolder holder, final int position) {
-            final Movie movie = mMovies.get(position);
+            Movie movie = mMovies.get(position);
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mItemListener.onUpcomingMovieClick(mMovies.get(position));
                 }
             });
-            if (movie.getBackdropPath() != null)
-                Picasso.with(mContext)
-                        .load(Api.createImageUrl(movie.getBackdropPath(), "w500").toString())
-                        .into(holder.mUpcomingMovieImage);
+            try {
+                Picasso.with(mContext).cancelRequest(holder.mUpcomingMovieImage);
+                if (movie.getBackdropPath() != null) {
+                    Picasso.with(mContext)
+                            .load(Api.createImageUrl(movie.getBackdropPath(), "w500").toString())
+                            .into(holder.mUpcomingMovieImage);
+                } else if (movie.getPosterPath() != null) {
+                    Picasso.with(mContext)
+                            .load(Api.createImageUrl(movie.getPosterPath(), "w500").toString())
+                            .into(holder.mUpcomingMovieImage);
+                } else {
+                    holder.mUpcomingMovieImage.setImageResource(R.drawable.ic_broken_image_black_100dp);
+                }
+            } catch (Exception e) {
+                holder.mUpcomingMovieImage.setImageResource(R.drawable.ic_broken_image_black_100dp);
+            }
             holder.mUpcomingMovieTitle.setText(movie.getTitle());
             holder.mUpcomingMovieGenre.setText(movie.getGenresString());
             holder.mUpcomingMovieReleaseDate.setText(movie.getReleaseDate());

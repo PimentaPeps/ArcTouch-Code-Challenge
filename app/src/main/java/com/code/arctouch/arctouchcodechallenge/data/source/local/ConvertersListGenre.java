@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class ConvertersListGenre {
     @TypeConverter
     public static ArrayList<UpcomingMovieDetailGenre> fromString(String value) {
-        Type listType = new TypeToken<ArrayList<String>>() {
+        Type listType = new TypeToken<ArrayList<UpcomingMovieDetailGenre>>() {
         }.getType();
         return new Gson().fromJson(value, listType);
     }

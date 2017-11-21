@@ -40,7 +40,7 @@ public class GetUpcomingMovies extends UseCase<GetUpcomingMovies.RequestValues, 
                 UpcomingMoviesFilterType currentFiltering = values.getCurrentFiltering();
                 UpcomingMovieFilter upcomingMovieFilter = mFilterFactory.create(currentFiltering);
 
-                List<Movie> moviesFiltered = upcomingMovieFilter.filter(movies);
+                List<Movie> moviesFiltered = upcomingMovieFilter.filter(movies, values.getFilteringWord());
                 ResponseValue responseValue = new ResponseValue(moviesFiltered);
                 getUseCaseCallback().onSuccess(responseValue);
             }
@@ -57,10 +57,12 @@ public class GetUpcomingMovies extends UseCase<GetUpcomingMovies.RequestValues, 
 
         private final UpcomingMoviesFilterType mCurrentFiltering;
         private final boolean mForceUpdate;
+        private final String mFilteringWord;
 
-        public RequestValues(boolean forceUpdate, @NonNull UpcomingMoviesFilterType currentFiltering) {
+        public RequestValues(boolean forceUpdate, @NonNull UpcomingMoviesFilterType currentFiltering, String filteringWord) {
             mForceUpdate = forceUpdate;
             mCurrentFiltering = checkNotNull(currentFiltering, "currentFiltering cannot be null!");
+            mFilteringWord = filteringWord;
         }
 
         public boolean isForceUpdate() {
@@ -69,6 +71,10 @@ public class GetUpcomingMovies extends UseCase<GetUpcomingMovies.RequestValues, 
 
         public UpcomingMoviesFilterType getCurrentFiltering() {
             return mCurrentFiltering;
+        }
+
+        public String getFilteringWord() {
+            return mFilteringWord;
         }
     }
 

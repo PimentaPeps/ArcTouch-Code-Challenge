@@ -44,6 +44,6 @@ public interface UpcomingMoviesContract {
 
         UpcomingMoviesFilterType getFiltering();
 
-        void setFiltering(UpcomingMoviesFilterType requestType);
+        void setFiltering(UpcomingMoviesFilterType requestType, String word);
     }
 }

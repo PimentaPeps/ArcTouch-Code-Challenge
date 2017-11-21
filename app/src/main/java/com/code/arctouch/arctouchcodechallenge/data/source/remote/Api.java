@@ -48,18 +48,21 @@ public class Api {
             return null;
         }
 
-        if (!imagesConfiguration.isValidSize(requiredSize)) {
-            throw new UpcomingMovieException("Invalid size: " + requiredSize);
+        if (imagesConfiguration != null) {
+            if (!imagesConfiguration.isValidSize(requiredSize)) {
+                throw new UpcomingMovieException("Invalid size: " + requiredSize);
+            }
+            
+            StringBuilder sb = new StringBuilder(imagesConfiguration.getBaseUrl());
+            sb.append(requiredSize);
+            sb.append(imagePath);
+            try {
+                return (new URL(sb.toString()));
+            } catch (MalformedURLException ex) {
+                throw new UpcomingMovieException(sb.toString(), ex);
+            }
         }
-
-        StringBuilder sb = new StringBuilder(imagesConfiguration.getBaseUrl());
-        sb.append(requiredSize);
-        sb.append(imagePath);
-        try {
-            return (new URL(sb.toString()));
-        } catch (MalformedURLException ex) {
-            throw new UpcomingMovieException(sb.toString(), ex);
-        }
+        return null;
     }
 
     public String getGenreName(int id) {

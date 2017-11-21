@@ -44,7 +44,7 @@ public class MoviesRemoteDataSource implements MoviesDataSource {
             final List<Movie> list = new ArrayList<>();
             ResponsePage responsePage = null;
             do {
-                responsePage = movies.getUpcomingMovies("en", responsePage == null ? 1 : responsePage.getPage() + 1);
+                responsePage = movies.getUpcomingMovies("", responsePage == null ? 0 : responsePage.getPage() + 1);
                 List<Movie> internalList = responsePage.getResults();
                 for (Movie movie : internalList) {
                     for (int i = 0; i < movie.getGenre_ids().size(); i++) {
@@ -76,7 +76,7 @@ public class MoviesRemoteDataSource implements MoviesDataSource {
     public void getMovieDetail(@NonNull final LoadMovieCallback callback, @NonNull final String movieId) {
         try {
             Movies movies = Api.getInstance().getMovies();
-            final Movie movie = movies.getMovie("en", movieId);
+            final Movie movie = movies.getMovie("", movieId);
 
             mAppExecutors.networkIO().execute(new Runnable() {
                 @Override
