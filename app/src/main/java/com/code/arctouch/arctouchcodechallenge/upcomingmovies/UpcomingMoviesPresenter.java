@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 
 import com.code.arctouch.arctouchcodechallenge.UseCase;
 import com.code.arctouch.arctouchcodechallenge.UseCaseHandler;
-import com.code.arctouch.arctouchcodechallenge.data.source.UpcomingMoviesDataSource;
-import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.UpcomingMovie;
+import com.code.arctouch.arctouchcodechallenge.data.source.MoviesDataSource;
+import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.Movie;
 import com.code.arctouch.arctouchcodechallenge.upcomingmovies.domain.usecase.GetUpcomingMovies;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public class UpcomingMoviesPresenter implements UpcomingMoviesContract.Presenter
     }
 
     /**
-     * @param forceUpdate   Pass in true to refresh the data in the {@link UpcomingMoviesDataSource}
+     * @param forceUpdate   Pass in true to refresh the data in the {@link MoviesDataSource}
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
     private void loadUpcomingMovies(boolean forceUpdate, final boolean showLoadingUI) {
@@ -62,12 +62,12 @@ public class UpcomingMoviesPresenter implements UpcomingMoviesContract.Presenter
                 new UseCase.UseCaseCallback<GetUpcomingMovies.ResponseValue>() {
                     @Override
                     public void onSuccess(GetUpcomingMovies.ResponseValue response) {
-                        List<UpcomingMovie> upcomingMovies = response.getUpcomingMovies();
+                        List<Movie> movies = response.getUpcomingMovies();
                         if (showLoadingUI) {
                             mUpcomingMoviesView.setLoadingIndicator(false);
                         }
 
-                        processUpcomingMovies(upcomingMovies);
+                        processUpcomingMovies(movies);
                     }
 
                     @Override
@@ -77,13 +77,13 @@ public class UpcomingMoviesPresenter implements UpcomingMoviesContract.Presenter
                 });
     }
 
-    private void processUpcomingMovies(List<UpcomingMovie> upcomingMovies) {
-        if (upcomingMovies.isEmpty()) {
-            // Show a message indicating there are no upcomingMovies for that filter type.
+    private void processUpcomingMovies(List<Movie> movies) {
+        if (movies.isEmpty()) {
+            // Show a message indicating there are no movies for that filter type.
             processEmptyUpcomingMovies();
         } else {
-            // Show the list of upcomingMovies
-            mUpcomingMoviesView.showUpcomingMovies(upcomingMovies);
+            // Show the list of movies
+            mUpcomingMoviesView.showUpcomingMovies(movies);
             // Set the filter label's text.
             showFilterLabel();
         }
@@ -111,9 +111,9 @@ public class UpcomingMoviesPresenter implements UpcomingMoviesContract.Presenter
     }
 
     @Override
-    public void openUpcomingMovieDetails(@NonNull UpcomingMovie requestedUpcomingMovie) {
-        checkNotNull(requestedUpcomingMovie, "requestedUpcomingMovie cannot be null!");
-        mUpcomingMoviesView.showUpcomingMovieDetailsUi(String.valueOf(requestedUpcomingMovie.getId()));
+    public void openUpcomingMovieDetails(@NonNull Movie requestedMovie) {
+        checkNotNull(requestedMovie, "requestedMovie cannot be null!");
+        mUpcomingMoviesView.showUpcomingMovieDetailsUi(String.valueOf(requestedMovie.getId()));
     }
 
     @Override

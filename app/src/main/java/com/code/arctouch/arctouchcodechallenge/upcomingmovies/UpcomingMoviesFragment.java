@@ -20,9 +20,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.code.arctouch.arctouchcodechallenge.Injection;
 import com.code.arctouch.arctouchcodechallenge.R;
 import com.code.arctouch.arctouchcodechallenge.data.source.remote.Api;
-import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.UpcomingMovie;
+import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.Movie;
+import com.code.arctouch.arctouchcodechallenge.moviedetail.MovieDetailFragment;
+import com.code.arctouch.arctouchcodechallenge.moviedetail.MovieDetailPresenter;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -31,22 +34,21 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Display a grid of {@link UpcomingMovie}s. User can choose to view all, active or completed upcomingMovies.
+ * Display a grid of {@link Movie}s. User can choose to view all, active or completed upcomingMovies.
  */
 public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesContract.View {
 
-    private static final int VERTICAL_ITEM_SPACE = 48;
     private UpcomingMoviesContract.Presenter mPresenter;
     /**
      * Listener for clicks on upcomingMovies in the ListView.
      */
     UpcomingMovieItemListener mItemListener = new UpcomingMovieItemListener() {
         @Override
-        public void onUpcomingMovieClick(UpcomingMovie clickedUpcomingMovie) {
-            mPresenter.openUpcomingMovieDetails(clickedUpcomingMovie);
+        public void onUpcomingMovieClick(Movie clickedMovie) {
+            mPresenter.openUpcomingMovieDetails(clickedMovie);
         }
     };
-
+    private MovieDetailPresenter mMovieDetailPresenter;
     private UpcomingMoviesAdapter mListAdapter;
     private View mNoUpcomingMoviesView;
     private ImageView mNoUpcomingMovieIcon;
@@ -65,7 +67,7 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mListAdapter = new UpcomingMoviesAdapter(new ArrayList<UpcomingMovie>(0), mItemListener, getContext());
+        mListAdapter = new UpcomingMoviesAdapter(new ArrayList<Movie>(0), mItemListener, getContext());
     }
 
     @Override
@@ -187,8 +189,8 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
     }
 
     @Override
-    public void showUpcomingMovies(List<UpcomingMovie> upcomingMovies) {
-        mListAdapter.replaceData(upcomingMovies);
+    public void showUpcomingMovies(List<Movie> movies) {
+        mListAdapter.replaceData(movies);
 
         mUpcomingMoviesView.setVisibility(View.VISIBLE);
         mNoUpcomingMoviesView.setVisibility(View.GONE);
@@ -238,6 +240,26 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
 //        Intent intent = new Intent(getContext(), UpcomingMovieDetailActivity.class);
 //        intent.putExtra(UpcomingMovieDetailActivity.EXTRA_UpcomingMovie_ID, UpcomingMovieId);
 //        startActivity(intent);
+
+//        MovieDetailFragment movieDetailFragment =
+//                (MovieDetailFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.upcoming_movies_container);
+//        if (movieDetailFragment == null) {
+//            // Create the fragment
+//            movieDetailFragment = MovieDetailFragment.newInstance();
+//            ActivityUtils.addFragmentToActivity(
+//                    getActivity().getSupportFragmentManager(), movieDetailFragment, R.id.upcoming_movies_container);
+//        }
+
+        MovieDetailFragment movieDetailFragment = MovieDetailFragment.newInstance();
+        movieDetailFragment.show((getActivity()).getSupportFragmentManager().beginTransaction(), "MyDialogFragment");
+
+        // Create the presenter
+        mMovieDetailPresenter = new MovieDetailPresenter(
+                Injection.provideUseCaseHandler(),
+                movieDetailFragment,
+                Injection.provideGetMoviesDetail(getActivity().getApplicationContext()),
+                UpcomingMovieId
+        );
     }
 
     @Override
@@ -250,27 +272,27 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
     }
 
     public interface UpcomingMovieItemListener {
-        void onUpcomingMovieClick(UpcomingMovie clickedUpcomingMovie);
+        void onUpcomingMovieClick(Movie clickedMovie);
     }
 
     private static class UpcomingMoviesAdapter extends RecyclerView.Adapter<UpcomingMoviesAdapter.MyViewHolder> {
         private final Context mContext;
-        private List<UpcomingMovie> mUpcomingMovies;
+        private List<Movie> mMovies;
         private UpcomingMovieItemListener mItemListener;
 
-        public UpcomingMoviesAdapter(List<UpcomingMovie> upcomingMovies, UpcomingMovieItemListener itemListener, Context context) {
-            setList(upcomingMovies);
+        public UpcomingMoviesAdapter(List<Movie> movies, UpcomingMovieItemListener itemListener, Context context) {
+            setList(movies);
             mItemListener = itemListener;
             mContext = context;
         }
 
-        public void replaceData(List<UpcomingMovie> upcomingMovies) {
-            setList(upcomingMovies);
+        public void replaceData(List<Movie> movies) {
+            setList(movies);
             notifyDataSetChanged();
         }
 
-        private void setList(List<UpcomingMovie> upcomingMovies) {
-            mUpcomingMovies = checkNotNull(upcomingMovies);
+        private void setList(List<Movie> movies) {
+            mMovies = checkNotNull(movies);
         }
 
         @Override
@@ -281,15 +303,21 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
         }
 
         @Override
-        public void onBindViewHolder(MyViewHolder holder, int position) {
-            final UpcomingMovie upcomingMovie = mUpcomingMovies.get(position);
-            if (upcomingMovie.getBackdropPath() != null)
+        public void onBindViewHolder(MyViewHolder holder, final int position) {
+            final Movie movie = mMovies.get(position);
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mItemListener.onUpcomingMovieClick(mMovies.get(position));
+                }
+            });
+            if (movie.getBackdropPath() != null)
                 Picasso.with(mContext)
-                        .load(Api.createImageUrl(upcomingMovie.getBackdropPath(), "w500").toString())
+                        .load(Api.createImageUrl(movie.getBackdropPath(), "w500").toString())
                         .into(holder.mUpcomingMovieImage);
-            holder.mUpcomingMovieTitle.setText(upcomingMovie.getTitle());
-            holder.mUpcomingMovieGenre.setText(upcomingMovie.getGenres());
-            holder.mUpcomingMovieReleaseDate.setText(upcomingMovie.getReleaseDate());
+            holder.mUpcomingMovieTitle.setText(movie.getTitle());
+            holder.mUpcomingMovieGenre.setText(movie.getGenresString());
+            holder.mUpcomingMovieReleaseDate.setText(movie.getReleaseDate());
         }
 
         @Override
@@ -299,7 +327,7 @@ public class UpcomingMoviesFragment extends Fragment implements UpcomingMoviesCo
 
         @Override
         public int getItemCount() {
-            return mUpcomingMovies.size();
+            return mMovies.size();
         }
 
         public class MyViewHolder extends RecyclerView.ViewHolder {

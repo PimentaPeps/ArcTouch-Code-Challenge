@@ -3,8 +3,8 @@ package com.code.arctouch.arctouchcodechallenge.data.source.remote;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.code.arctouch.arctouchcodechallenge.data.source.UpcomingMoviesDataSource;
-import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.UpcomingMovie;
+import com.code.arctouch.arctouchcodechallenge.data.source.MoviesDataSource;
+import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.Movie;
 import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.core.ResponsePage;
 import com.code.arctouch.arctouchcodechallenge.util.AppExecutors;
 
@@ -14,25 +14,25 @@ import java.util.List;
 /**
  * Concrete implementation of a data source as a remote data source.
  */
-public class UpcomingMoviesRemoteDataSource implements UpcomingMoviesDataSource {
+public class MoviesRemoteDataSource implements MoviesDataSource {
 
-    private static UpcomingMoviesRemoteDataSource INSTANCE;
+    private static MoviesRemoteDataSource INSTANCE;
     private AppExecutors mAppExecutors;
 
     // Private constructor to prevent direct instantiation.
-    private UpcomingMoviesRemoteDataSource(@NonNull AppExecutors appExecutors) {
+    private MoviesRemoteDataSource(@NonNull AppExecutors appExecutors) {
         mAppExecutors = appExecutors;
     }
 
-    public static UpcomingMoviesRemoteDataSource getInstance(@NonNull AppExecutors appExecutors) {
+    public static MoviesRemoteDataSource getInstance(@NonNull AppExecutors appExecutors) {
         if (INSTANCE == null) {
-            INSTANCE = new UpcomingMoviesRemoteDataSource(appExecutors);
+            INSTANCE = new MoviesRemoteDataSource(appExecutors);
         }
         return INSTANCE;
     }
 
     /**
-     * Note: {@link LoadUpcomingMoviesCallback#onDataNotAvailable()} is never fired. In a real remote data
+     * Note: {@link LoadMoviesCallback#onDataNotAvailable()} is never fired. In a real remote data
      * source implementation, this would be fired if the server can't be contacted or the server
      * returns an error.
      */
@@ -41,15 +41,15 @@ public class UpcomingMoviesRemoteDataSource implements UpcomingMoviesDataSource 
 
         try {
             Movies movies = Api.getInstance().getMovies();
-            final List<UpcomingMovie> list = new ArrayList<>();
+            final List<Movie> list = new ArrayList<>();
             ResponsePage responsePage = null;
             do {
                 responsePage = movies.getUpcomingMovies("en", responsePage == null ? 1 : responsePage.getPage() + 1);
-                List<UpcomingMovie> internalList = responsePage.getResults();
-                for (UpcomingMovie upcomingMovie : internalList) {
-                    for (int i = 0; i < upcomingMovie.getGenre_ids().size(); i++) {
-                        upcomingMovie.getGenre_ids()
-                                .set(i, Api.getInstance().getGenreName(Integer.valueOf(upcomingMovie.getGenre_ids().get(i))));
+                List<Movie> internalList = responsePage.getResults();
+                for (Movie movie : internalList) {
+                    for (int i = 0; i < movie.getGenre_ids().size(); i++) {
+                        movie.getGenre_ids()
+                                .set(i, Api.getInstance().getGenreName(Integer.valueOf(movie.getGenre_ids().get(i))));
                     }
                 }
                 list.addAll(internalList);
@@ -73,7 +73,30 @@ public class UpcomingMoviesRemoteDataSource implements UpcomingMoviesDataSource 
     }
 
     @Override
-    public void saveUpcomingMovie(@NonNull UpcomingMovie upcomingMovie) {
+    public void getMovieDetail(@NonNull final LoadMovieCallback callback, @NonNull final String movieId) {
+        try {
+            Movies movies = Api.getInstance().getMovies();
+            final Movie movie = movies.getMovie("en", movieId);
+
+            mAppExecutors.networkIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onMovieLoaded(movie);
+                }
+            });
+        } catch (Exception e) {
+            Log.e("SyncError", "getUpcomingMovies: ", e);
+            mAppExecutors.networkIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onDataNotAvailable(movieId);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void saveMovie(@NonNull Movie movie) {
         //Do nothing
     }
 
@@ -83,7 +106,7 @@ public class UpcomingMoviesRemoteDataSource implements UpcomingMoviesDataSource 
     }
 
     @Override
-    public void deleteAllUpcomingMovies() {
+    public void deleteAllMovies() {
         //Do nothing
     }
 }

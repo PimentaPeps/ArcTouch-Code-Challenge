@@ -84,12 +84,10 @@ dependencies {
 
     compileOnly "org.yamj:api-common:$rootProject.yamjVersion"
 
-//    compile "com.fasterxml.jackson.core:jackson-core:$rootProject.fasterXMLVersion"
-//    compile "com.fasterxml.jackson.core:jackson-annotations:$rootProject.fasterXMLVersion"
     compile "com.fasterxml.jackson.core:jackson-databind:$rootProject.fasterXMLVersion"
 
     compile "org.slf4j:jcl-over-slf4j:$rootProject.slf4jVersion"
     compile "com.squareup.picasso:picasso:$rootProject.picassoVersion"
     compile "com.google.code.gson:gson:$rootProject.gsonVersion"
-//    compile "commons-codec:commons-codec:$rootProject.commonsCodecVersion"
+    compile "com.android.support:cardview-v7:$rootProject.cardViewVersion"
 }

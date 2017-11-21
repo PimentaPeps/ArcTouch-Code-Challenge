@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Created by gusta on 20/11/2017.
  */
 
-public class Converters {
+public class ConvertersListString {
     @TypeConverter
     public static ArrayList<String> fromString(String value) {
         Type listType = new TypeToken<ArrayList<String>>() {
@@ -26,4 +26,5 @@ public class Converters {
         String json = gson.toJson(list);
         return json;
     }
+
 }

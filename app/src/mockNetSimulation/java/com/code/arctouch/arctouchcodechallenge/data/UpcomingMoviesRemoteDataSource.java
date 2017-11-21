@@ -84,7 +84,7 @@ public class UpcomingMoviesRemoteDataSource implements UpcomingMoviesDataSource 
 
     @Override
     public void refreshUpcomingMovies() {
-        // Not required because the {@link UpcomingMoviesRepository} handles the logic of refreshing the
+        // Not required because the {@link MoviesRepository} handles the logic of refreshing the
         // upcomingMovies from all the available data sources.
     }
 

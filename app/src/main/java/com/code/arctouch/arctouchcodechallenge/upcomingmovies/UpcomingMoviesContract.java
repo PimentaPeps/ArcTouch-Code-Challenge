@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.code.arctouch.arctouchcodechallenge.BasePresenter;
 import com.code.arctouch.arctouchcodechallenge.BaseView;
-import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.UpcomingMovie;
+import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.Movie;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public interface UpcomingMoviesContract {
 
         void setLoadingIndicator(boolean active);
 
-        void showUpcomingMovies(List<UpcomingMovie> upcomingMovies);
+        void showUpcomingMovies(List<Movie> movies);
 
         void showUpcomingMovieDetailsUi(String upcomingMoviesId);
 
@@ -40,7 +40,7 @@ public interface UpcomingMoviesContract {
 
         void loadUpcomingMovies(boolean forceUpdate);
 
-        void openUpcomingMovieDetails(@NonNull UpcomingMovie requestedUpcomingMovie);
+        void openUpcomingMovieDetails(@NonNull Movie requestedMovie);
 
         UpcomingMoviesFilterType getFiltering();
 

@@ -1,12 +1,11 @@
-
 package com.code.arctouch.arctouchcodechallenge.upcomingmovies.domain.usecase;
 
 import android.support.annotation.NonNull;
 
 import com.code.arctouch.arctouchcodechallenge.UseCase;
-import com.code.arctouch.arctouchcodechallenge.data.source.UpcomingMoviesDataSource;
-import com.code.arctouch.arctouchcodechallenge.data.source.UpcomingMoviesRepository;
-import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.UpcomingMovie;
+import com.code.arctouch.arctouchcodechallenge.data.source.MoviesDataSource;
+import com.code.arctouch.arctouchcodechallenge.data.source.MoviesRepository;
+import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.Movie;
 import com.code.arctouch.arctouchcodechallenge.upcomingmovies.UpcomingMoviesFilterType;
 import com.code.arctouch.arctouchcodechallenge.upcomingmovies.domain.filter.FilterFactory;
 import com.code.arctouch.arctouchcodechallenge.upcomingmovies.domain.filter.UpcomingMovieFilter;
@@ -20,11 +19,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class GetUpcomingMovies extends UseCase<GetUpcomingMovies.RequestValues, GetUpcomingMovies.ResponseValue> {
 
-    private final UpcomingMoviesRepository mUpcomingMoviesRepository;
+    private final MoviesRepository mUpcomingMoviesRepository;
 
     private final FilterFactory mFilterFactory;
 
-    public GetUpcomingMovies(@NonNull UpcomingMoviesRepository upcomingMoviesRepository, @NonNull FilterFactory filterFactory) {
+    public GetUpcomingMovies(@NonNull MoviesRepository upcomingMoviesRepository, @NonNull FilterFactory filterFactory) {
         mUpcomingMoviesRepository = checkNotNull(upcomingMoviesRepository, "upcomingMoviesRepository cannot be null!");
         mFilterFactory = checkNotNull(filterFactory, "filterFactory cannot be null!");
     }
@@ -35,14 +34,14 @@ public class GetUpcomingMovies extends UseCase<GetUpcomingMovies.RequestValues, 
             mUpcomingMoviesRepository.refreshUpcomingMovies();
         }
 
-        mUpcomingMoviesRepository.getUpcomingMovies(new UpcomingMoviesDataSource.LoadUpcomingMoviesCallback() {
+        mUpcomingMoviesRepository.getUpcomingMovies(new MoviesDataSource.LoadUpcomingMoviesCallback() {
             @Override
-            public void onUpcomingMoviesLoaded(List<UpcomingMovie> upcomingMovies) {
+            public void onUpcomingMoviesLoaded(List<Movie> movies) {
                 UpcomingMoviesFilterType currentFiltering = values.getCurrentFiltering();
                 UpcomingMovieFilter upcomingMovieFilter = mFilterFactory.create(currentFiltering);
 
-                List<UpcomingMovie> upcomingMoviesFiltered = upcomingMovieFilter.filter(upcomingMovies);
-                ResponseValue responseValue = new ResponseValue(upcomingMoviesFiltered);
+                List<Movie> moviesFiltered = upcomingMovieFilter.filter(movies);
+                ResponseValue responseValue = new ResponseValue(moviesFiltered);
                 getUseCaseCallback().onSuccess(responseValue);
             }
 
@@ -75,14 +74,14 @@ public class GetUpcomingMovies extends UseCase<GetUpcomingMovies.RequestValues, 
 
     public static final class ResponseValue implements UseCase.ResponseValue {
 
-        private final List<UpcomingMovie> mUpcomingMovies;
+        private final List<Movie> mMovies;
 
-        public ResponseValue(@NonNull List<UpcomingMovie> upcomingMovies) {
-            mUpcomingMovies = checkNotNull(upcomingMovies, "upcomingMovies cannot be null!");
+        public ResponseValue(@NonNull List<Movie> movies) {
+            mMovies = checkNotNull(movies, "movies cannot be null!");
         }
 
-        public List<UpcomingMovie> getUpcomingMovies() {
-            return mUpcomingMovies;
+        public List<Movie> getUpcomingMovies() {
+            return mMovies;
         }
     }
 }

@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * UpcomingMovie Model entity for database and API
+ * Movie Model entity for database and API
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
-@Entity(tableName = "upcomingMovies")
-public class UpcomingMovie extends IdProperty {
+@Entity(tableName = "Movie")
+public class Movie extends IdProperty {
 
     @Nullable
     @ColumnInfo(name = "title")
@@ -82,6 +82,17 @@ public class UpcomingMovie extends IdProperty {
     @ColumnInfo(name = "genre_ids")
     @JsonProperty("genre_ids")
     private ArrayList<String> genre_ids;
+
+    @Nullable
+    @ColumnInfo(name = "genres")
+    @JsonProperty("genres")
+    private ArrayList<UpcomingMovieDetailGenre> genres;
+
+    @Nullable
+    @ColumnInfo(name = "budget")
+    @JsonProperty("budget")
+    private int budget;
+
 
     public String getBackdropPath() {
         return backdropPath;
@@ -193,13 +204,39 @@ public class UpcomingMovie extends IdProperty {
         this.genre_ids = genre_ids;
     }
 
-    public String getGenres() {
+    public String getGenresString() {
         StringBuilder sb = new StringBuilder();
-        for (Iterator iter = genre_ids.iterator(); iter.hasNext(); ) {
-            sb.append(iter.next());
-            if (iter.hasNext())
-                sb.append(" | ");
+        if (genre_ids != null) {
+            for (Iterator iter = genre_ids.iterator(); iter.hasNext(); ) {
+                sb.append(iter.next());
+                if (iter.hasNext())
+                    sb.append(" | ");
+            }
+        } else if (genres != null) {
+            for (Iterator iter = genres.iterator(); iter.hasNext(); ) {
+                sb.append(((UpcomingMovieDetailGenre) iter.next()).getName());
+                if (iter.hasNext())
+                    sb.append(" | ");
+            }
         }
         return sb.toString();
+    }
+
+    @Nullable
+    public int getBudget() {
+        return budget;
+    }
+
+    public void setBudget(@Nullable int budget) {
+        this.budget = budget;
+    }
+
+    @Nullable
+    public ArrayList<UpcomingMovieDetailGenre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(@Nullable ArrayList<UpcomingMovieDetailGenre> genres) {
+        this.genres = genres;
     }
 }

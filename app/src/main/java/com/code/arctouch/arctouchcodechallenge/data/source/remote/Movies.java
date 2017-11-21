@@ -1,5 +1,6 @@
 package com.code.arctouch.arctouchcodechallenge.data.source.remote;
 
+import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.Movie;
 import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.core.MovieResponse;
 import com.code.arctouch.arctouchcodechallenge.data.source.remote.tools.ApiUrl;
 
@@ -24,5 +25,15 @@ public class Movies extends AbstractApi {
         apiUrl.addLanguage(language);
         apiUrl.addPage(page);
         return mapJsonResult(apiUrl, MovieResponse.class);
+    }
+
+
+    /**
+     * Returns list of upcoming movies.
+     */
+    public Movie getMovie(String language, String movieId) {
+        ApiUrl apiUrl = new ApiUrl(MOVIE, movieId);
+        apiUrl.addLanguage(language);
+        return mapJsonResult(apiUrl, Movie.class);
     }
 }
