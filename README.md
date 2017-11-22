@@ -29,7 +29,7 @@ With 2 different build types:
 Debug
 Release
 ``````
-Mock and MockIntegrated don’t use Release, it for test purpose only.
+mockFake and mockNetSimulation don’t use Release, it for test purpose only.
 
 This project uses a local db (mysql) with Room to do persistency of some data. On network absence the user still can see movie information. At the time images still need network
 
