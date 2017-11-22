@@ -4,7 +4,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
-import com.code.arctouch.arctouchcodechallenge.data.source.UpcomingMoviesDataSource;
+import com.code.arctouch.arctouchcodechallenge.data.source.MoviesDataSource;
+import com.code.arctouch.arctouchcodechallenge.data.source.remote.model.Movie;
 import com.google.common.collect.Lists;
 
 import java.util.LinkedHashMap;
@@ -13,11 +14,11 @@ import java.util.Map;
 /**
  * Implementation of the data source that adds a latency simulating network.
  */
-public class UpcomingMoviesRemoteDataSource implements UpcomingMoviesDataSource {
+public class MoviesRemoteDataSource implements MoviesDataSource {
 
     private static final int SERVICE_LATENCY_IN_MILLIS = 5000;
-    private static final Map<String, UpcomingMovie> TASKS_SERVICE_DATA;
-    private static UpcomingMoviesRemoteDataSource INSTANCE;
+    private static final Map<String, Movie> TASKS_SERVICE_DATA;
+    private static MoviesRemoteDataSource INSTANCE;
 
     static {
         TASKS_SERVICE_DATA = new LinkedHashMap<>(2);
@@ -26,19 +27,20 @@ public class UpcomingMoviesRemoteDataSource implements UpcomingMoviesDataSource 
     }
 
     // Prevent direct instantiation.
-    private UpcomingMoviesRemoteDataSource() {
+    private MoviesRemoteDataSource() {
     }
 
-    public static UpcomingMoviesRemoteDataSource getInstance() {
+    public static MoviesRemoteDataSource getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new UpcomingMoviesRemoteDataSource();
+            INSTANCE = new MoviesRemoteDataSource();
         }
         return INSTANCE;
     }
 
     private static void addUpcomingMovie(String title, String description) {
-        UpcomingMovie newUpcomingMovie = new UpcomingMovie(title, description);
-        TASKS_SERVICE_DATA.put(newUpcomingMovie.getId(), newUpcomingMovie);
+        Movie newMovie = new Movie();
+        newMovie.setId(1);
+        TASKS_SERVICE_DATA.put(String.valueOf(newMovie.getId()), newMovie);
     }
 
     /**
@@ -58,28 +60,14 @@ public class UpcomingMoviesRemoteDataSource implements UpcomingMoviesDataSource 
         }, SERVICE_LATENCY_IN_MILLIS);
     }
 
-    /**
-     * Note: {@link GetUpcomingMovieCallback#onDataNotAvailable()} is never fired. In a real remote data
-     * source implementation, this would be fired if the server can't be contacted or the server
-     * returns an error.
-     */
     @Override
-    public void getUpcomingMovie(@NonNull String upcomingMovieId, final @NonNull GetUpcomingMovieCallback callback) {
-        final UpcomingMovie upcomingMovie = TASKS_SERVICE_DATA.get(upcomingMovieId);
+    public void getMovieDetail(@NonNull LoadMovieCallback callback, String movieId) {
 
-        // Simulate network by delaying the execution.
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                callback.onUpcomingMovieLoaded(upcomingMovie);
-            }
-        }, SERVICE_LATENCY_IN_MILLIS);
     }
 
     @Override
-    public void saveUpcomingMovie(@NonNull UpcomingMovie upcomingMovie) {
-        TASKS_SERVICE_DATA.put(upcomingMovie.getId(), upcomingMovie);
+    public void saveMovie(@NonNull Movie movie) {
+
     }
 
     @Override
@@ -89,12 +77,7 @@ public class UpcomingMoviesRemoteDataSource implements UpcomingMoviesDataSource 
     }
 
     @Override
-    public void deleteAllUpcomingMovies() {
-        TASKS_SERVICE_DATA.clear();
-    }
+    public void deleteAllMovies() {
 
-    @Override
-    public void deleteUpcomingMovie(@NonNull String upcomingMovieId) {
-        TASKS_SERVICE_DATA.remove(upcomingMovieId);
     }
 }
