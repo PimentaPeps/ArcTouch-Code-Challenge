@@ -8,13 +8,15 @@ Android project - gradle
 
 This project uses libraries:
 
--Room for database creation and management
--Apache commons for API calls
--Jackson's faster xml for object serialization/deserialization
--Picasso for Image loading and cache management
--Gson for Json
--Cardview for cardview support
--LFJ4 for logs
+``````
+*Room for database creation and management
+*Apache commons for API calls
+*Jackson's faster xml for object serialization/deserialization
+*Picasso for Image loading and cache management
+*Gson for Json
+*Cardview for cardview support
+*LFJ4 for logs
+``````
 
 It has 3 different flavors:
 ``````
