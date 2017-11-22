@@ -1,5 +1,5 @@
-# ArchTouch-Code-Challenge
-Project for code challenge on ArchTouch
+# ArcTouch-Code-Challenge
+Project for code challenge on ArcTouch
 
 
 General
